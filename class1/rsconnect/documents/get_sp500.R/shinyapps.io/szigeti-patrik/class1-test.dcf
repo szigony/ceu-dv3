@@ -1,0 +1,13 @@
+name: class1-test
+title: class1-test
+username:
+account: szigeti-patrik
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2116083
+bundleId: 3012613
+url: https://szigeti-patrik.shinyapps.io/class1-test/
+when: 1586883328.70663
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: action_button.R|bmi.R|infobox.R|intro.R|navbar_page.R|password.R|plot_sp500.R|shiny_functions.R|sidebar.R|table_sp500.R|using_div.R
