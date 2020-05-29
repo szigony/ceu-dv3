@@ -1,22 +1,18 @@
 ### Header
 header <- dashboardHeader(
   title = tags$div(
-    tags$h4("Comparison of", style = "padding-right: 5px;"),
     tags$img(src = "netflix_logo.png", class = "header-logo"),
-    tags$h4("behaviors", style = "padding-left: 5px;"),
+    tags$h4("Behavior", style = "padding-left: 5px;"),
     class = "title-div"
-  ),
-  titleWidth = 300
+  )
 )
 
-
-
-
-### Siderbar
+### Sidebar
 sidebar <- dashboardSidebar(
-  width = 300,
   sidebarMenu(
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard"))
+    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+    menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
+    menuItem("Comparison", tabName = "comparison", icon = icon("people-carry"))
   )
 )
 
@@ -27,8 +23,13 @@ body <- dashboardBody(
   tabItems(
     tabItem(
       tabName = "dashboard",
-      tags$h1("Dashboard"),
-      DT::dataTableOutput("table")
+      
+      fluidRow(
+        valueBoxOutput("tv_shows", width = 3),
+        valueBoxOutput("episodes_watched", width = 3),
+        valueBoxOutput("movies_watched", width = 3),
+        valueBox(200, "Time Wasted", icon = icon("clock"), width = 3)
+      )
     )
   )
 )
