@@ -28,7 +28,7 @@ body <- dashboardBody(
         valueBoxOutput("tv_shows", width = 3),
         valueBoxOutput("episodes_watched", width = 3),
         valueBoxOutput("movies_watched", width = 3),
-        valueBox(200, "Time Wasted", icon = icon("clock"), width = 3)
+        valueBoxOutput("time_wasted", width = 3)
       )
     )
   )
@@ -37,7 +37,7 @@ body <- dashboardBody(
 ### Dashboard
 ui <- dashboardPage(
   skin = "red",
-  title = "Comparison of Netflix behavior",
+  title = "Netflix Behavior",
   
   header,
   sidebar,

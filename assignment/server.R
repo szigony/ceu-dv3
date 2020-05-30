@@ -34,4 +34,11 @@ server <- function(input, output) {
     )
   })
   
+  output$time_wasted <- renderValueBox({
+    valueBox(
+      time_wasted(data), "Spent on Netflix", icon = icon("clock"),
+      color = "blue"
+    )
+  })
+  
 }

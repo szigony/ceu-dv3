@@ -66,7 +66,7 @@ create_view_history <- function() {
   
 }
 
-### Counts
+### Calculations
 # TV shows
 tv_shows <- function(data) {
   return(n_distinct(data %>% filter(is_movie == "No") %>% select(title)))
@@ -80,4 +80,18 @@ episodes_watched <- function(data) {
 # Movies watched
 movies_watched <- function(data) {
   return(n_distinct(data %>% filter(is_movie == "Yes") %>% select(title)))
+}
+
+# Time wasted
+time_wasted <- function(data) {
+  overall_time <- seconds_to_period(
+    (data %>% 
+       select(title, episode, runtime) %>% 
+       distinct() %>% 
+       select(-c(episode, title)) %>% 
+       summarise_all(funs(sum)) %>% 
+       pull(1)
+     )*60)
+  
+  return(paste0(day(overall_time), "d ", hour(overall_time), "H ", minute(overall_time), "M"))
 }
