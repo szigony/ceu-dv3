@@ -5,6 +5,7 @@ library(tidyverse)
 library(tRakt)
 library(lubridate)
 library(ggplot2)
+library(plotly)
 
 ### Create view history
 create_view_history <- function() {
@@ -100,19 +101,16 @@ time_wasted <- function(data) {
 
 ### Charts
 # Last X days at a glance
+### TODO add scaling for X axis, include input for X days
 last_x_days_chart <- function(data) {
-  g <- ggplot(data %>% group_by(date) %>% count(date), 
-              aes(x = format(date, "%m/%d"), y = n)) +
-    geom_point(size = 10, color = "tomato3") +
-    geom_text(aes(label = n), color = "white", fontface = "bold", size = 5) +
-    labs(
-      title = "Last 30 days at a glance",
-      subtitle = paste0(
-        time_wasted(data), " watched - ",
-        episodes_watched(data), " episodes - ",
-        movies_watched(data), " movies"
-      )
-    ) +
+  data <- data %>% group_by(date) %>% count(date)
+  max_data <- max(data$n)
+  
+  g <- ggplot(data, 
+              aes(x = date, y = n, text = paste0("Watched episodes: <b>", n, "</b>"))) +
+    geom_point(size = 6, color = "teal") +
+    geom_text(aes(label = n), color = "white", fontface = "bold", size = 4) +
+    ylim(0, max_data+1) +
     theme(
       axis.text.x = element_text(angle = 65, vjust = 0.6),
       axis.title = element_blank(),

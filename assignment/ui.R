@@ -33,7 +33,7 @@ body <- dashboardBody(
       
       fluidRow(
         column(width = 10, offset = 1,
-          plotOutput("last_x_days_chart")
+          plotlyOutput("last_x_days_chart")
         )
       )
     ),
