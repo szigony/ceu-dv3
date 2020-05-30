@@ -65,3 +65,19 @@ create_view_history <- function() {
   return(view_history)
   
 }
+
+### Counts
+# TV shows
+tv_shows <- function(data) {
+  return(n_distinct(data %>% filter(is_movie == "No") %>% select(title)))
+}
+
+# Episodes watched
+episodes_watched <- function(data) {
+  return(n_distinct(data %>% filter(is_movie == "No") %>% select(title, episode)))
+}
+
+# Movies watched
+movies_watched <- function(data) {
+  return(n_distinct(data %>% filter(is_movie == "Yes") %>% select(title)))
+}
