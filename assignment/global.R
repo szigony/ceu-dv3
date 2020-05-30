@@ -4,6 +4,7 @@ library(shinydashboard)
 library(tidyverse)
 library(tRakt)
 library(lubridate)
+library(ggplot2)
 
 ### Create view history
 create_view_history <- function() {
@@ -23,9 +24,10 @@ create_view_history <- function() {
       subtitle = ifelse(grepl(paste(season_types, collapse = "|"), subtitle), NA, subtitle),
       episode = ifelse(colon_count == 0, NA, episode),
       is_movie = ifelse(is.na(season), "Yes", "No"),
-      date = Date
+      date = Date,
+      title = ifelse(!is.na(subtitle), paste0(title, ":", subtitle), title)
     ) %>% 
-    select(-c(colon_count, Date))
+    select(-c(colon_count, Date, subtitle))
   
   ### trakt datasets (http://jemus42.github.io/tRakt/index.html)
   # Get view history from trakt
@@ -95,3 +97,34 @@ time_wasted <- function(data) {
   
   return(paste0(day(overall_time), "d ", hour(overall_time), "H ", minute(overall_time), "M"))
 }
+
+### Charts
+# Last X days at a glance
+last_x_days_chart <- function(data) {
+  g <- ggplot(data %>% group_by(date) %>% count(date), 
+              aes(x = format(date, "%m/%d"), y = n)) +
+    geom_point(size = 10, color = "tomato3") +
+    geom_text(aes(label = n), color = "white", fontface = "bold", size = 5) +
+    labs(
+      title = "Last 30 days at a glance",
+      subtitle = paste0(
+        time_wasted(data), " watched - ",
+        episodes_watched(data), " episodes - ",
+        movies_watched(data), " movies"
+      )
+    ) +
+    theme(
+      axis.text.x = element_text(angle = 65, vjust = 0.6),
+      axis.title = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.y = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.background = element_blank(),
+      plot.background = element_blank()
+    )
+  
+  return(g)
+}
+
+

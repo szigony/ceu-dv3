@@ -1,18 +1,18 @@
-### Calculations
+### Data
 data <- create_view_history()
 
 ### Server
 server <- function(input, output) {
   
-  output$table <- DT::renderDataTable({
-    DT::datatable(
-      data,
-      options = list(
-        processing = FALSE
-      )
-    )
-  })
+  ### Data related calculations
+  # Last X Days ### TODO make reactive
+  last_x_days <- data %>% 
+    select(date, title, episode, is_movie, runtime) %>% 
+    subset(date >= Sys.Date() - 30) %>% 
+    distinct()
   
+  ### Dashboard
+  # KPIs
   output$tv_shows <- renderValueBox({
     valueBox(
       tv_shows(data), "Different TV Shows", icon = icon("tv"),
@@ -40,5 +40,10 @@ server <- function(input, output) {
       color = "blue"
     )
   })
+  
+  # Last X days at a glance
+  output$last_x_days_chart <- renderPlot({
+    last_x_days_chart(last_x_days)
+  }, bg = "transparent", height = 300)
   
 }

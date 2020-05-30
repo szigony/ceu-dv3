@@ -29,7 +29,23 @@ body <- dashboardBody(
         valueBoxOutput("episodes_watched", width = 3),
         valueBoxOutput("movies_watched", width = 3),
         valueBoxOutput("time_wasted", width = 3)
+      ),
+      
+      fluidRow(
+        column(width = 10, offset = 1,
+          plotOutput("last_x_days_chart")
+        )
       )
+    ),
+    
+    tabItem(
+      tabName = "statistics",
+      tags$h1("Statistics")
+    ),
+    
+    tabItem(
+      tabName = "comparison",
+      tags$h1("Comparison")
     )
   )
 )
