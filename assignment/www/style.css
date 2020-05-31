@@ -12,3 +12,7 @@
 .skin-red .main-header .logo, .skin-red .main-header .logo:hover, .skin-red .main-header .navbar {
   background-color: #000;
 }
+
+.last-x-days-title {
+  font-size: 18px;
+}
