@@ -12,7 +12,10 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
     menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
-    menuItem("Comparison", tabName = "comparison", icon = icon("people-carry"))
+    menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
+    
+    sliderInput("last_x_days_slider", h4("Select Last Days Shown"),
+                min = 30, max = 90, value = 30, step = 5)
   )
 )
 

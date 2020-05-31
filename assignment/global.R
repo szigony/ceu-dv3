@@ -101,21 +101,24 @@ time_wasted <- function(data) {
 
 ### Charts
 # Last X days at a glance
-### TODO add scaling for X axis, include input for X days
 last_x_days_chart <- function(data) {
   data <- data %>% group_by(date) %>% count(date)
   max_data <- max(data$n)
+  mean_data <- mean(data$n)
   
   g <- ggplot(data, 
               aes(x = date, y = n, text = paste0("Watched episodes: <b>", n, "</b>"))) +
-    geom_point(size = 6, color = "teal") +
+    geom_point(size = 6, color = "skyblue3") +
+    scale_x_date(date_labels = "%m/%d", date_breaks = "1 day") +
     geom_text(aes(label = n), color = "white", fontface = "bold", size = 4) +
-    ylim(0, max_data+1) +
+    geom_hline(yintercept = mean_data, color = "goldenrod1") +
+    ylim(0, max_data + 1) +
     theme(
       axis.text.x = element_text(angle = 65, vjust = 0.6),
       axis.title = element_blank(),
-      axis.ticks = element_blank(),
       axis.text.y = element_blank(),
+      axis.line.x = element_line(color = "gray64"),
+      axis.ticks.y = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
       panel.background = element_blank(),

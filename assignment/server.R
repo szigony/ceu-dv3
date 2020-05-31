@@ -5,11 +5,13 @@ data <- create_view_history()
 server <- function(input, output) {
   
   ### Data related calculations
-  # Last X Days ### TODO make reactive
-  last_x_days <- data %>% 
-    select(date, title, episode, is_movie, runtime) %>% 
-    subset(date >= Sys.Date() - 30) %>% 
-    distinct()
+  # Last X Days
+  last_x_days <- reactive({
+    data %>% 
+      select(date, title, episode, is_movie, runtime) %>% 
+      subset(date >= Sys.Date() - input$last_x_days_slider) %>% 
+      distinct()
+  })
   
   ### Dashboard
   # KPIs
@@ -44,15 +46,15 @@ server <- function(input, output) {
   # Last X days at a glance
   output$last_x_days_chart <- renderPlotly({
     ggplotly(
-      last_x_days_chart(last_x_days),
+      last_x_days_chart(last_x_days()),
       tooltip = c("text")
     ) %>% 
       layout(
         title = list(
-          text = paste0("Last 30 Days at a Glance<br><sup>", 
-                        time_wasted(last_x_days), " watched - ",
-                        episodes_watched(last_x_days), " episodes - ",
-                        movies_watched(last_x_days), " movies</sup>"),
+          text = paste0("Last ", input$last_x_days_slider, " Days at a Glance<br><sup>", 
+                        time_wasted(last_x_days()), " watched - ",
+                        episodes_watched(last_x_days()), " episodes - ",
+                        movies_watched(last_x_days()), " movies</sup>"),
           x = 0, y = 0.95
         ),
         paper_bgcolor = "transparent",
