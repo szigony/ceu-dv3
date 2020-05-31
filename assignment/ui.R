@@ -38,6 +38,11 @@ body <- dashboardBody(
         column(width = 10, offset = 1,
           plotlyOutput("last_x_days_chart")
         )
+      ),
+      
+      fluidRow(
+        column(width = 10, offset = 1,
+          plotlyOutput("last_x_days_by_genre"))
       )
     ),
     

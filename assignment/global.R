@@ -100,14 +100,13 @@ time_wasted <- function(data) {
 }
 
 ### Charts
-# Last X days at a glance
+# Last X Days at a Glance
 last_x_days_chart <- function(data) {
   data <- data %>% group_by(date) %>% count(date)
   max_data <- max(data$n)
   mean_data <- mean(data$n)
   
-  g <- ggplot(data, 
-              aes(x = date, y = n, text = paste0("Watched episodes: <b>", n, "</b>"))) +
+  p <- ggplot(data, aes(x = date, y = n, text = paste0("Watched episodes: <b>", n, "</b>"))) +
     geom_point(size = 6, color = "skyblue3") +
     scale_x_date(date_labels = "%m/%d", date_breaks = "1 day") +
     geom_text(aes(label = n), color = "white", fontface = "bold", size = 4) +
@@ -125,7 +124,22 @@ last_x_days_chart <- function(data) {
       plot.background = element_blank()
     )
   
-  return(g)
+  return(p)
 }
 
-
+# Last X Days by Genre
+last_x_days_by_genre <- function(data) {
+  p <- ggplot(test_data, aes(fill = genres, x = 1, text = paste0("<b>", genres, "</b><br>"))) +
+    geom_bar(position = "stack") +
+    coord_flip() +
+    theme(
+      axis.title = element_blank(),
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      panel.grid = element_blank(),
+      panel.background = element_blank(),
+      plot.background = element_blank()
+    )
+  
+  return(p)
+}

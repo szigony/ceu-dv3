@@ -43,7 +43,7 @@ server <- function(input, output) {
     )
   })
   
-  # Last X days at a glance
+  # Last X Days at a Glance
   output$last_x_days_chart <- renderPlotly({
     ggplotly(
       last_x_days_chart(last_x_days()),
@@ -57,6 +57,18 @@ server <- function(input, output) {
                         movies_watched(last_x_days()), " movies</sup>"),
           x = 0, y = 0.95
         ),
+        paper_bgcolor = "transparent",
+        plot_bgcolor = "transparent"
+      )
+  })
+  
+  # Last X Days by Genre
+  output$last_x_days_by_genre <- renderPlotly({
+    ggplotly(
+      last_x_days_by_genre(last_x_days()),
+      tooltip = c("text")
+    ) %>% 
+      layout(
         paper_bgcolor = "transparent",
         plot_bgcolor = "transparent"
       )
