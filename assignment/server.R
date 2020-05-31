@@ -8,9 +8,17 @@ server <- function(input, output) {
   # Last X Days
   last_x_days <- reactive({
     data %>% 
-      select(date, title, episode, is_movie, runtime) %>% 
+      select(date, title, episode, is_movie, runtime, genres) %>% 
       subset(date >= Sys.Date() - input$last_x_days_slider) %>% 
       distinct()
+  })
+  
+  ### Text Output
+  # Last X Days
+  output$last_x_days_title <- renderPrint({
+    HTML(paste0("<p style='last-x-days-title'>Last ", input$last_x_days_slider, " Days at a Glance<br><b>",
+                time_wasted(last_x_days()), "</b> watched - <b>", episodes_watched(last_x_days()), "</b> episodes - <b>",
+                movies_watched(last_x_days()), "</b> movies"))
   })
   
   ### Dashboard
@@ -46,23 +54,16 @@ server <- function(input, output) {
   # Last X Days at a Glance
   output$last_x_days_chart <- renderPlotly({
     ggplotly(
-      last_x_days_chart(last_x_days()),
+      last_x_days_chart(last_x_days() %>% select(-genres) %>% distinct()),
       tooltip = c("text")
     ) %>% 
       layout(
-        title = list(
-          text = paste0("Last ", input$last_x_days_slider, " Days at a Glance<br><sup>", 
-                        time_wasted(last_x_days()), " watched - ",
-                        episodes_watched(last_x_days()), " episodes - ",
-                        movies_watched(last_x_days()), " movies</sup>"),
-          x = 0, y = 0.95
-        ),
         paper_bgcolor = "transparent",
         plot_bgcolor = "transparent"
       )
   })
   
-  # Last X Days by Genre
+  # Last X Days by Genres
   output$last_x_days_by_genre <- renderPlotly({
     ggplotly(
       last_x_days_by_genre(last_x_days()),

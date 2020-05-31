@@ -15,7 +15,7 @@ sidebar <- dashboardSidebar(
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
     
     sliderInput("last_x_days_slider", h4("Select Last Days Shown"),
-                min = 30, max = 90, value = 30, step = 5)
+                min = 5, max = 90, value = 30, step = 5)
   )
 )
 
@@ -35,14 +35,15 @@ body <- dashboardBody(
       ),
       
       fluidRow(
-        column(width = 10, offset = 1,
-          plotlyOutput("last_x_days_chart")
+        box(
+          title = uiOutput("last_x_days_title"), width = 9, status = "primary",
+          plotlyOutput("last_x_days_chart", height = "400px")
+        ),
+        
+        box(
+          title = "Breakdown by Genres", width = 3, status = "success",
+          plotlyOutput("last_x_days_by_genre", height = "400px")
         )
-      ),
-      
-      fluidRow(
-        column(width = 10, offset = 1,
-          plotlyOutput("last_x_days_by_genre"))
       )
     ),
     

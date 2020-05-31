@@ -6,6 +6,7 @@ library(tRakt)
 library(lubridate)
 library(ggplot2)
 library(plotly)
+library(data.table)
 
 ### Create view history
 create_view_history <- function() {
@@ -92,11 +93,11 @@ time_wasted <- function(data) {
        select(title, episode, runtime) %>% 
        distinct() %>% 
        select(-c(episode, title)) %>% 
-       summarise_all(funs(sum)) %>% 
+       summarise_all(list(sum)) %>% 
        pull(1)
      )*60)
   
-  return(paste0(day(overall_time), "d ", hour(overall_time), "H ", minute(overall_time), "M"))
+  return(paste0(lubridate::day(overall_time), "d ", lubridate::hour(overall_time), "H ", lubridate::minute(overall_time), "M"))
 }
 
 ### Charts
@@ -107,11 +108,11 @@ last_x_days_chart <- function(data) {
   mean_data <- mean(data$n)
   
   p <- ggplot(data, aes(x = date, y = n, text = paste0("Watched episodes: <b>", n, "</b>"))) +
-    geom_point(size = 6, color = "skyblue3") +
+    geom_point(size = 6, color = "#00C1A7") +
     scale_x_date(date_labels = "%m/%d", date_breaks = "1 day") +
     geom_text(aes(label = n), color = "white", fontface = "bold", size = 4) +
-    geom_hline(yintercept = mean_data, color = "goldenrod1") +
-    ylim(0, max_data + 1) +
+    geom_hline(yintercept = mean_data, color = "firebrick2") +
+    ylim(0, max_data) +
     theme(
       axis.text.x = element_text(angle = 65, vjust = 0.6),
       axis.title = element_blank(),
@@ -129,8 +130,15 @@ last_x_days_chart <- function(data) {
 
 # Last X Days by Genre
 last_x_days_by_genre <- function(data) {
-  p <- ggplot(test_data, aes(fill = genres, x = 1, text = paste0("<b>", genres, "</b><br>"))) +
-    geom_bar(position = "stack") +
+  data <- data %>% 
+    group_by(genres) %>% 
+    summarise(movies_count = uniqueN(title[is_movie == "Yes"]), show_count = uniqueN(title[is_movie == "No"]),
+              episode_count = uniqueN(episode[is_movie == "No"]), total_count = uniqueN(title))
+  
+  p <- ggplot(data, aes(fill = genres, x = reorder(genres, total_count), y = total_count,
+                        text = paste0("<b>", genres, "</b><br>", episode_count, " episodes<br>", 
+                                      show_count, " shows<br>", movies_count, " movies"))) +
+    geom_bar(stat = "identity", show.legend = FALSE) +
     coord_flip() +
     theme(
       axis.title = element_blank(),
@@ -138,7 +146,8 @@ last_x_days_by_genre <- function(data) {
       axis.ticks = element_blank(),
       panel.grid = element_blank(),
       panel.background = element_blank(),
-      plot.background = element_blank()
+      plot.background = element_blank(),
+      legend.position = "none"
     )
   
   return(p)
