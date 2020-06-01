@@ -106,7 +106,22 @@ body <- dashboardBody(
     # Comparison
     tabItem(
       tabName = "comparison",
-      tags$h1("Comparison")
+      
+      fluidRow(
+        box(
+          title = "% Match", width = 3, status = "info"
+        ),
+        
+        box(
+          title = "Distribution of Genres", width = 9, status = "primary"
+        )
+      ),
+      
+      fluidRow(
+        box(
+          title = "Comparison of Total # of Views", width = 12, status = "success"
+        )
+      )
     )
   )
 )

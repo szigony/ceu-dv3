@@ -59,8 +59,8 @@ server <- function(input, output) {
   
   # Netflix History File Upload
   output$netflix_history_file <- renderUI({
-    HTML("<p style='white-space: normal; padding: 10px; font-size: 0.9em;'>You can download your history from Netflix by navigating to
-         'Account' < 'Profile' < 'Viewing activity'. Click <b>Download all</b> on the bottom of the page.</p>")
+    HTML("<p style='white-space: normal; padding: 0px 10px 10px 10px; font-size: 0.9em;'>You can download your history from Netflix by 
+         navigating to <i>Account</i> < <i>Profile</i> < <i>Viewing activity</i>. Click <b>Download all</b> on the bottom of the page.</p>")
   })
   
   ### Overview
