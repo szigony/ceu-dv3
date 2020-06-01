@@ -26,6 +26,12 @@ server <- function(input, output) {
         if (length(input$title_select) == 0) title == title else title %in% input$title_select
       )
   })
+
+  # Uploaded file
+  history_to_compare <- reactive({
+    file <- input$file
+    return(netflix_data(csv_file = file$datapath))
+  })
   
   ### Filters
   possible_choices <- reactive({
@@ -46,21 +52,21 @@ server <- function(input, output) {
   ### Text Output
   # Last X Days
   output$last_x_days_title <- renderPrint({
-    HTML(paste0("<p style='last-x-days-title'>Last ", input$last_x_days_slider, " Days at a Glance<br><b>",
+    HTML(paste0("<p class='last-x-days-title'>Last ", input$last_x_days_slider, " Days at a Glance<br><b>",
                 time_wasted(last_x_days()), "</b> watched - <b>", episodes_watched(last_x_days()), "</b> episodes - <b>",
                 movies_watched(last_x_days()), "</b> movies"))
   })
   
   # Disclaimer
   output$disclaimer <- renderUI({
-    HTML("<p style='white-space: normal; padding: 10px; font-size: 0.9em;'><i>Disclaimer:</i> The view history was downloaded from 
+    HTML("<p class='disclaimer'><i>Disclaimer:</i> The view history was downloaded from 
         Netflix. Additional information (e.g. genres, runtime) was added via trakt.tv's API.</p>")
   })
   
   # Netflix History File Upload
   output$netflix_history_file <- renderUI({
-    HTML("<p style='white-space: normal; padding: 0px 10px 10px 10px; font-size: 0.9em;'>You can download your history from Netflix by 
-         navigating to <i>Account</i> < <i>Profile</i> < <i>Viewing activity</i>. Click <b>Download all</b> on the bottom of the page.</p>")
+    HTML("<p class='how-to-download'>You can download your history from Netflix by navigating to 
+         <i>Account</i> < <i>Profile</i> < <i>Viewing activity</i>. Click <b>Download all</b> on the bottom of the page.</p>")
   })
   
   ### Overview
@@ -158,6 +164,42 @@ server <- function(input, output) {
       daily_views(date_range()),
       tooltip = c("text")
     )
+  })
+  
+  ### Comparison
+  # Match
+  output$match <- renderInfoBox({
+    if (is.null(input$file)) {
+      infoBox(
+        "Match", "?", icon = icon("percent"), color = "light-blue", fill = TRUE
+      )
+    } else {
+      infoBox(
+        "Overall Match", percentage_match(netflix_data(), history_to_compare()), icon = icon("percent"), color = "green", fill = TRUE
+      ) 
+    }
+  })
+  
+  # Test DataTable
+  output$test <- DT::renderDataTable({
+    if (is.null(input$file)) {
+      DT::datatable(tibble("Error:" = "Please upload a file in the sidebar."))
+    } else {
+      DT::datatable(history_to_compare())
+    }
+  })
+  
+  # Comparison of Total # of Views
+  output$compare_views <- renderPlotly({
+    if (is.null(input$file)) {
+      plot(1, 1, col = "white")
+      text(1, 1, "Please upload a file in the sidebar.")
+    } else {
+      ggplotly(
+        comparison_chart(netflix_data(), history_to_compare(), input$date[1], input$date[2]),
+        tooltip = c("text")
+      )
+    }
   })
   
 }

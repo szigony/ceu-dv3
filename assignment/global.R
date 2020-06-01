@@ -24,13 +24,12 @@ my_theme <- theme(
 )
 
 ##### Create view history
-create_view_history <- function() {
+netflix_data <- function(csv_file = "data/NetflixViewingHistory.csv") {
   
-  ### Netflix viewing history
   # Load and transform Netflix data
   season_types <- c("Season", "Episode", "Chapter", "Part", "Series", "Volume")
   
-  netflix_data <- read.csv("data/NetflixViewingHistory.csv") %>% 
+  netflix_data <- read.csv(csv_file) %>% 
     mutate(colon_count = str_count(Title, ":")) %>% 
     separate(Title, c("title", "subtitle", "season", "episode"), sep = ":") %>% 
     mutate(
@@ -45,6 +44,16 @@ create_view_history <- function() {
       title = ifelse(!is.na(subtitle), paste0(title, ":", subtitle), title)
     ) %>% 
     select(-c(colon_count, Date, subtitle))
+  
+  return(netflix_data)
+  
+}
+
+create_view_history <- function() {
+  
+  ### Netflix viewing history
+  # Load and transform Netflix data
+  netflix_data <- netflix_data()
   
   ### trakt datasets (http://jemus42.github.io/tRakt/index.html)
   # Get view history from trakt
@@ -76,9 +85,6 @@ create_view_history <- function() {
     mutate(date = mdy(date)) %>% 
     select(-c(trakt_id, imdb_id)) %>% 
     distinct()
-  
-  ### Remove unnecessary variables
-  rm(netflix_data, show_summary, trakt_history, season_types, show_ids, movie_ids) 
 
   ### Return the created table
   return(view_history)
@@ -86,6 +92,7 @@ create_view_history <- function() {
 }
 
 ##### Calculations
+### Overview
 # TV shows
 tv_shows <- function(data) {
   return(n_distinct(data %>% filter(is_movie == "No") %>% select(title)))
@@ -113,6 +120,15 @@ time_wasted <- function(data) {
      )*60)
   
   return(paste0(lubridate::day(overall_time), "d ", lubridate::hour(overall_time), "H ", lubridate::minute(overall_time), "M"))
+}
+
+### Comparison
+# % Match
+percentage_match <- function(my_data, uploaded_data) {
+  total <- n_distinct(my_data %>% rbind(uploaded_data) %>% select(title))
+  overlap <- n_distinct(my_data %>% select(title) %>% inner_join(uploaded_data %>% select(title)))
+  
+  return(percent(overlap / total))
 }
 
 ##### Charts
@@ -175,9 +191,8 @@ shared_stats_data <- function(data) {
   return(data)
 }
 
-# Total Number of Views
-total_no_of_views <- function(data) {
-  data <- shared_stats_data(data) %>% 
+shared_cum_sum <- function(data) {
+  data <- data %>% 
     mutate(
       movie_count = ifelse(is_movie == "Yes", n, 0),
       show_count = ifelse(is_movie == "No", n, 0)
@@ -188,6 +203,11 @@ total_no_of_views <- function(data) {
     select(date, cum_show, cum_movie) %>% 
     gather("movie_or_show", "cum_sum", -date) %>% 
     mutate(movie_or_show = ifelse(movie_or_show == "cum_show", "TV Show", "Movie"))
+}
+
+# Total Number of Views
+total_no_of_views <- function(data) {
+  data <- shared_cum_sum(shared_stats_data(data))
   
   p <- ggplot(data, aes(x = date, y = cum_sum, fill = movie_or_show, text = paste0("Date: <b>", date, "</b><br>Type: <b>",
                                                                                    movie_or_show, "</b><br>Total Views: <b>",
@@ -212,6 +232,28 @@ daily_views <- function(data) {
   p <- ggplot(data, aes(x = date, y = n, fill = is_movie, text = paste0("Date: <b>", date, "</b><br>Type: <b>", is_movie,
                                                                         "</b><br>Count: <b>", n, "</b>"))) +
     geom_col() +
+    scale_x_date(date_labels = "%m/%d", date_breaks = "1 week") +
+    my_theme +
+    theme(
+      axis.ticks = element_blank(),
+      legend.title = element_blank(),
+      legend.position = "top"
+    )
+  
+  return(p)
+}
+
+### Comparison
+# Total # of Views
+comparison_chart <- function(compare_me, compare_other, start_date, end_date) {
+  compare_me <- shared_cum_sum(shared_stats_data(compare_me %>% mutate(date = mdy(date)))) %>% 
+    subset(date >= format(start_date) & date <= format(end_date))
+  compare_other <- shared_cum_sum(shared_stats_data(compare_other %>% mutate(date = mdy(date)))) %>% 
+    subset(date >= format(start_date) & date <= format(end_date))
+  
+  p <- ggplot(NULL, aes(date, cum_sum, text = paste0("Date: <b>", date, "</b><br>Total Views: <b>", cum_sum, "</b>"))) +
+    geom_col(data = compare_me, fill = "#00BF7D", alpha = 0.4) +
+    geom_col(data = compare_other, fill = "#FF6C90") +
     scale_x_date(date_labels = "%m/%d", date_breaks = "1 week") +
     my_theme +
     theme(

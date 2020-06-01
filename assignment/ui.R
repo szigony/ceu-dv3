@@ -24,15 +24,19 @@ sidebar <- dashboardSidebar(
     
     conditionalPanel(
       condition = "input.smenu == 'statistics'",
-      dateRangeInput(inputId = "date", h5("Date Range"),
-                     start = "2020-01-01", end = Sys.Date()),
       numericInput(inputId = "show_top", h5("Top Views Shown"), value = 5)
     ),
     
     conditionalPanel(
       condition = "input.smenu == 'comparison'",
-      fileInput("file", h5("Upload Your Netflix History")),
+      fileInput("file", h5("Upload Your Netflix History"), accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
       htmlOutput("netflix_history_file")
+    ),
+    
+    conditionalPanel(
+      condition = "input.smenu == 'statistics' | input.smenu == 'comparison'",
+      dateRangeInput(inputId = "date", h5("Date Range"),
+                     start = "2020-01-01", end = Sys.Date())
     ),
     
     # Static Inputs
@@ -80,7 +84,7 @@ body <- dashboardBody(
       
       fluidRow(
         box(
-          title = "Total Number of Views", width = 9, status = "primary",
+          title = "Cumulative Number of Views in this Period", width = 9, status = "primary",
           plotlyOutput("total_no_of_views")
         ),
         
@@ -108,18 +112,18 @@ body <- dashboardBody(
       tabName = "comparison",
       
       fluidRow(
-        box(
-          title = "% Match", width = 3, status = "info"
-        ),
+        infoBoxOutput("match", width = 3),
         
         box(
-          title = "Distribution of Genres", width = 9, status = "primary"
+          title = "Distribution of Genres", width = 9, status = "primary",
+          DT::dataTableOutput("test")
         )
       ),
       
       fluidRow(
         box(
-          title = "Comparison of Total # of Views", width = 12, status = "success"
+          title = "Comparison of All Time Total # of Views", width = 12, status = "success",
+          plotlyOutput("compare_views")
         )
       )
     )

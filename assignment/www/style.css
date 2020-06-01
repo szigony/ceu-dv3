@@ -16,3 +16,19 @@
 .last-x-days-title {
   font-size: 18px;
 }
+
+.disclaimer {
+  white-space: normal; 
+  padding: 10px; 
+  font-size: 0.9em;
+}
+
+.how-to-download {
+  white-space: normal; 
+  padding: 0 10px 10px 10px; 
+  font-size: 0.9em;
+}
+
+.info-box-number {
+  font-size: 36px;
+}
