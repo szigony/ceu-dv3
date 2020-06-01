@@ -1,4 +1,4 @@
-### Load libraries
+##### Load libraries
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
@@ -7,8 +7,23 @@ library(lubridate)
 library(ggplot2)
 library(plotly)
 library(data.table)
+library(DT)
 
-### Create view history
+##### Shared theme elements for ggplot
+my_theme <- theme(
+  axis.text.x = element_text(angle = 65, vjust = 0.6),
+  axis.title = element_blank(),
+  axis.text.y = element_blank(),
+  axis.line.x = element_line(color = "gray84"),
+  panel.grid.major.y = element_line(color = "gray84"),
+  panel.grid.minor.y = element_line(color = "gray84"),
+  panel.grid.major.x = element_blank(),
+  panel.grid.minor.x = element_blank(),
+  panel.background = element_blank(),
+  plot.background = element_blank()
+)
+
+##### Create view history
 create_view_history <- function() {
   
   ### Netflix viewing history
@@ -70,7 +85,7 @@ create_view_history <- function() {
   
 }
 
-### Calculations
+##### Calculations
 # TV shows
 tv_shows <- function(data) {
   return(n_distinct(data %>% filter(is_movie == "No") %>% select(title)))
@@ -100,7 +115,8 @@ time_wasted <- function(data) {
   return(paste0(lubridate::day(overall_time), "d ", lubridate::hour(overall_time), "H ", lubridate::minute(overall_time), "M"))
 }
 
-### Charts
+##### Charts
+### Overview
 # Last X Days at a Glance
 last_x_days_chart <- function(data) {
   data <- data %>% group_by(date) %>% count(date)
@@ -113,16 +129,9 @@ last_x_days_chart <- function(data) {
     geom_text(aes(label = n), color = "white", fontface = "bold", size = 4) +
     geom_hline(yintercept = mean_data, color = "firebrick2") +
     ylim(0, max_data) +
+    my_theme +
     theme(
-      axis.text.x = element_text(angle = 65, vjust = 0.6),
-      axis.title = element_blank(),
-      axis.text.y = element_blank(),
-      axis.line.x = element_line(color = "gray64"),
-      axis.ticks.y = element_blank(),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.background = element_blank(),
-      plot.background = element_blank()
+      axis.ticks.y = element_blank()
     )
   
   return(p)
@@ -151,4 +160,88 @@ last_x_days_by_genre <- function(data) {
     )
   
   return(p)
+}
+
+### Statistics
+# Shared Data
+shared_stats_data <- function(data) {
+  data <- data %>% 
+    select(date, title, episode, is_movie) %>% 
+    distinct() %>% 
+    group_by(date, is_movie) %>% 
+    count(is_movie) %>% 
+    ungroup()
+  
+  return(data)
+}
+
+# Total Number of Views
+total_no_of_views <- function(data) {
+  data <- shared_stats_data(data) %>% 
+    mutate(
+      movie_count = ifelse(is_movie == "Yes", n, 0),
+      show_count = ifelse(is_movie == "No", n, 0)
+    ) %>% 
+    group_by(is_movie) %>% 
+    mutate(cum_show = cumsum(show_count), cum_movie = cumsum(movie_count)) %>% 
+    ungroup() %>% 
+    select(date, cum_show, cum_movie) %>% 
+    gather("movie_or_show", "cum_sum", -date) %>% 
+    mutate(movie_or_show = ifelse(movie_or_show == "cum_show", "TV Show", "Movie"))
+  
+  p <- ggplot(data, aes(x = date, y = cum_sum, fill = movie_or_show, text = paste0("Date: <b>", date, "</b><br>Type: <b>",
+                                                                                   movie_or_show, "</b><br>Total Views: <b>",
+                                                                                   cum_sum, "</b>"))) +
+    geom_col() +
+    scale_x_date(date_labels = "%m/%d", date_breaks = "1 week") +
+    my_theme +
+    theme(
+      axis.ticks = element_blank(),
+      legend.title = element_blank(),
+      legend.position = "top"
+    )
+  
+  return(p)
+}
+
+# Daily Views
+daily_views <- function(data) {
+  data <- shared_stats_data(data) %>% 
+    mutate(is_movie = ifelse(is_movie == "Yes", "Movie", "TV Show"))
+  
+  p <- ggplot(data, aes(x = date, y = n, fill = is_movie, text = paste0("Date: <b>", date, "</b><br>Type: <b>", is_movie,
+                                                                        "</b><br>Count: <b>", n, "</b>"))) +
+    geom_col() +
+    scale_x_date(date_labels = "%m/%d", date_breaks = "1 week") +
+    my_theme +
+    theme(
+      axis.ticks = element_blank(),
+      legend.title = element_blank(),
+      legend.position = "top"
+    )
+  
+  return(p)
+}
+
+##### Tables
+# Most Popular TV Shows
+most_popular_tv_shows <- function(data, top_n) {
+  data <- data %>% 
+    filter(is_movie == "No") %>% 
+    select(title, episode) %>% 
+    distinct() %>% 
+    group_by(title) %>% 
+    count() %>% 
+    ungroup() %>% 
+    arrange(-n) %>% 
+    top_n(top_n)
+}
+
+# Most Popular Movies
+most_popular_movies <- function(data, top_n) {
+  data %>% 
+    filter(is_movie == "Yes") %>% 
+    select(title) %>% 
+    distinct() %>% 
+    top_n(top_n)
 }

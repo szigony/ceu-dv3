@@ -3,7 +3,7 @@ data <- create_view_history()
 
 ### Server
 server <- function(input, output) {
-  
+
   ### Data related calculations
   # Last X Days
   last_x_days <- reactive({
@@ -15,6 +15,16 @@ server <- function(input, output) {
         if (length(input$title_select) == 0) title == title else title %in% input$title_select
       ) %>% 
       distinct()
+  })
+  
+  # Date Range
+  date_range <- reactive({
+    data %>% 
+      subset(date >= format(input$date[1]) & date <= format(input$date[2])) %>% 
+      filter(
+        if (input$is_movie_select == 2) is_movie == is_movie else is_movie == input$is_movie_select,
+        if (length(input$title_select) == 0) title == title else title %in% input$title_select
+      )
   })
   
   ### Filters
@@ -43,8 +53,14 @@ server <- function(input, output) {
   
   # Disclaimer
   output$disclaimer <- renderUI({
-    HTML("<p style='white-space: normal; padding: 10px;'>The view history was downloaded from Netflix. Additional information 
-         (e.g. genres, runtime) was added via trakt.tv's API.</p>")
+    HTML("<p style='white-space: normal; padding: 10px; font-size: 0.9em;'><i>Disclaimer:</i> The view history was downloaded from 
+        Netflix. Additional information (e.g. genres, runtime) was added via trakt.tv's API.</p>")
+  })
+  
+  # Netflix History File Upload
+  output$netflix_history_file <- renderUI({
+    HTML("<p style='white-space: normal; padding: 10px; font-size: 0.9em;'>You can download your history from Netflix by navigating to
+         'Account' < 'Profile' < 'Viewing activity'. Click <b>Download all</b> on the bottom of the page.</p>")
   })
   
   ### Overview
@@ -86,11 +102,7 @@ server <- function(input, output) {
       ggplotly(
         last_x_days_chart(last_x_days() %>% select(-genres) %>% distinct()),
         tooltip = c("text")
-      ) %>% 
-        layout(
-          paper_bgcolor = "transparent",
-          plot_bgcolor = "transparent"
-        )
+      )
     }
   })
   
@@ -103,12 +115,49 @@ server <- function(input, output) {
       ggplotly(
         last_x_days_by_genre(last_x_days()),
         tooltip = c("text")
-      ) %>% 
-        layout(
-          paper_bgcolor = "transparent",
-          plot_bgcolor = "transparent"
-        )
+      )
     }
+  })
+  
+  ### Statistics
+  # Total Number of Views
+  output$total_no_of_views <- renderPlotly({
+    ggplotly(
+      total_no_of_views(date_range()),
+      tooltip = c("text")
+    )
+  })
+  
+  # Most Popular TV Shows
+  output$popular_tv_shows <- DT::renderDataTable({
+    DT::datatable(
+      most_popular_tv_shows(date_range(), input$show_top),
+      colnames = c("TV Show", "Episodes"),
+      options = list(
+        paging = FALSE,
+        searching = FALSE
+      )
+    )
+  })
+  
+  # Most Popular Movies
+  output$popular_movies <- DT::renderDataTable({
+    DT::datatable(
+      most_popular_movies(date_range(), input$show_top),
+      colnames = c("Movie"),
+      options = list(
+        paging = FALSE,
+        searching = FALSE
+      )
+    )
+  })
+  
+  # Daily Views
+  output$daily_views <- renderPlotly({
+    ggplotly(
+      daily_views(date_range()),
+      tooltip = c("text")
+    )
   })
   
 }

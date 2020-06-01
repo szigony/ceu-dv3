@@ -9,15 +9,33 @@ header <- dashboardHeader(
 
 ### Sidebar
 sidebar <- dashboardSidebar(
-  sidebarMenu(
+  sidebarMenu(id = "smenu",
     # Menu Items
     menuItem("Overview", tabName = "overview", icon = icon("dashboard")),
     menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
+
+    # Conditional Inputs
+    conditionalPanel(
+      condition = "input.smenu == 'overview'",
+      sliderInput("last_x_days_slider", h5("Last Days Shown"),
+                  min = 5, max = 90, value = 30, step = 5)
+    ),
     
-    # Inputs
-    sliderInput("last_x_days_slider", h5("Last Days Shown"),
-                min = 5, max = 90, value = 30, step = 5),
+    conditionalPanel(
+      condition = "input.smenu == 'statistics'",
+      dateRangeInput(inputId = "date", h5("Date Range"),
+                     start = "2020-01-01", end = Sys.Date()),
+      numericInput(inputId = "show_top", h5("Top Views Shown"), value = 5)
+    ),
+    
+    conditionalPanel(
+      condition = "input.smenu == 'comparison'",
+      fileInput("file", h5("Upload Your Netflix History")),
+      htmlOutput("netflix_history_file")
+    ),
+    
+    # Static Inputs
     uiOutput("is_movie"),
     uiOutput("title_selection"),
     
@@ -59,7 +77,30 @@ body <- dashboardBody(
     # Statistics
     tabItem(
       tabName = "statistics",
-      tags$h1("Statistics")
+      
+      fluidRow(
+        box(
+          title = "Total Number of Views", width = 9, status = "primary",
+          plotlyOutput("total_no_of_views")
+        ),
+        
+        box(
+          title = "Most Popular TV Shows", width = 3, status = "success",
+          DT::dataTableOutput("popular_tv_shows")
+        )
+      ),
+      
+      fluidRow(
+        box(
+          title = "Most Popular Movies", width = 3, status = "danger",
+          DT::dataTableOutput("popular_movies")
+        ),
+        
+        box(
+          title = "Daily Views", width = 9, status = "warning",
+          plotlyOutput("daily_views")
+        )
+      )
     ),
     
     # Comparison
