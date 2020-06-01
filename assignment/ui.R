@@ -16,8 +16,9 @@ sidebar <- dashboardSidebar(
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
     
     # Inputs
-    sliderInput("last_x_days_slider", h4("Last Days Shown"),
+    sliderInput("last_x_days_slider", h5("Last Days Shown"),
                 min = 5, max = 90, value = 30, step = 5),
+    uiOutput("is_movie"),
     uiOutput("title_selection")
   )
 )
