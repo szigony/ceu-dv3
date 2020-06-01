@@ -13,6 +13,11 @@ server <- function(input, output) {
       distinct()
   })
   
+  ### Filters
+  output$title_selection <- renderUI({
+    selectInput(inputId = "title_select", label = h4("Title"), choices = sort(unique(data$title)), multiple = TRUE)
+  })
+  
   ### Text Output
   # Last X Days
   output$last_x_days_title <- renderPrint({

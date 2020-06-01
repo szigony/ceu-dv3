@@ -10,12 +10,15 @@ header <- dashboardHeader(
 ### Sidebar
 sidebar <- dashboardSidebar(
   sidebarMenu(
+    # Menu Items
     menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
     menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
     
-    sliderInput("last_x_days_slider", h4("Select Last Days Shown"),
-                min = 5, max = 90, value = 30, step = 5)
+    # Inputs
+    sliderInput("last_x_days_slider", h4("Last Days Shown"),
+                min = 5, max = 90, value = 30, step = 5),
+    uiOutput("title_selection")
   )
 )
 
