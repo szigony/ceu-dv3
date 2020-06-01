@@ -11,7 +11,7 @@ header <- dashboardHeader(
 sidebar <- dashboardSidebar(
   sidebarMenu(
     # Menu Items
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+    menuItem("Overview", tabName = "overview", icon = icon("dashboard")),
     menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
     
@@ -27,8 +27,9 @@ body <- dashboardBody(
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
   
   tabItems(
+    # Overview
     tabItem(
-      tabName = "dashboard",
+      tabName = "overview",
       
       fluidRow(
         valueBoxOutput("tv_shows", width = 3),
@@ -50,11 +51,13 @@ body <- dashboardBody(
       )
     ),
     
+    # Statistics
     tabItem(
       tabName = "statistics",
       tags$h1("Statistics")
     ),
     
+    # Comparison
     tabItem(
       tabName = "comparison",
       tags$h1("Comparison")

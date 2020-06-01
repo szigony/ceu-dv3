@@ -26,7 +26,7 @@ server <- function(input, output) {
                 movies_watched(last_x_days()), "</b> movies"))
   })
   
-  ### Dashboard
+  ### Overview
   # KPIs
   output$tv_shows <- renderValueBox({
     valueBox(
