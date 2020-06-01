@@ -41,6 +41,12 @@ server <- function(input, output) {
                 movies_watched(last_x_days()), "</b> movies"))
   })
   
+  # Disclaimer
+  output$disclaimer <- renderUI({
+    HTML("<p style='white-space: normal; padding: 10px;'>The view history was downloaded from Netflix. Additional information 
+         (e.g. genres, runtime) was added via trakt.tv's API.</p>")
+  })
+  
   ### Overview
   # KPIs
   output$tv_shows <- renderValueBox({

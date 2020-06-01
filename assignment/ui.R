@@ -19,7 +19,10 @@ sidebar <- dashboardSidebar(
     sliderInput("last_x_days_slider", h5("Last Days Shown"),
                 min = 5, max = 90, value = 30, step = 5),
     uiOutput("is_movie"),
-    uiOutput("title_selection")
+    uiOutput("title_selection"),
+    
+    # Disclaimer
+    htmlOutput("disclaimer")
   )
 )
 
@@ -47,7 +50,8 @@ body <- dashboardBody(
         
         box(
           title = "Breakdown by Genres", width = 3, status = "success",
-          plotlyOutput("last_x_days_by_genre", height = "400px")
+          plotlyOutput("last_x_days_by_genre", height = "400px"),
+          footer = "A title can belong to multiple genres."
         )
       )
     ),
