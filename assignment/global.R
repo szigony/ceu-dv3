@@ -8,6 +8,7 @@ library(ggplot2)
 library(plotly)
 library(data.table)
 library(DT)
+library(scales)
 
 ##### Shared theme elements for ggplot
 my_theme <- theme(
