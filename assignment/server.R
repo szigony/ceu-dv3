@@ -91,6 +91,11 @@ server <- function(input, output) {
          <i>Account</i> < <i>Profile</i> < <i>Viewing activity</i>. Click <b>Download all</b> on the bottom of the page.</p>")
   })
   
+  # Comparison Disclaimer
+  output$comparison_disclaimer <- renderUI({
+    HTML("<p class='disclaimer'><i>Disclaimer:</i> The Comparison tab only uses data that was downloaded from Netflix.")
+  })
+  
   ### Overview
   # KPIs
   output$tv_shows <- renderValueBox({

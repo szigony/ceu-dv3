@@ -15,7 +15,10 @@ sidebar <- dashboardSidebar(
     menuItem("Statistics", tabName = "statistics", icon = icon("chart-bar")),
     menuItem("Comparison", tabName = "comparison", icon = icon("people-carry")),
 
-    # Conditional Inputs
+    # Static Inputs
+    uiOutput("title_selection"),
+
+    # Conditional Inputs    
     conditionalPanel(
       condition = "input.smenu == 'overview'",
       sliderInput("last_x_days_slider", h5("Last Days Shown"),
@@ -28,12 +31,6 @@ sidebar <- dashboardSidebar(
     ),
     
     conditionalPanel(
-      condition = "input.smenu == 'comparison'",
-      fileInput("file", h5("Upload Your Netflix History"), accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
-      htmlOutput("netflix_history_file")
-    ),
-    
-    conditionalPanel(
       condition = "input.smenu == 'statistics' | input.smenu == 'comparison'",
       dateRangeInput(inputId = "date", h5("Date Range"),
                      start = "2020-01-01", end = Sys.Date())
@@ -41,14 +38,17 @@ sidebar <- dashboardSidebar(
     
     conditionalPanel(
       condition = "input.smenu == 'overview' | input.smenu == 'statistics'",
-      uiOutput("is_movie")
+      uiOutput("is_movie"),
+      htmlOutput("disclaimer")
     ),
     
-    # Static Inputs
-    uiOutput("title_selection"),
-    
-    # Disclaimer
-    htmlOutput("disclaimer")
+    conditionalPanel(
+      condition = "input.smenu == 'comparison'",
+      fileInput("file", h5("Upload Your Netflix History"), accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
+      htmlOutput("netflix_history_file"),
+      htmlOutput("comparison_disclaimer")
+    )
+
   )
 )
 
