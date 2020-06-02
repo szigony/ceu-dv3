@@ -54,7 +54,10 @@ sidebar <- dashboardSidebar(
 
 ### Body
 body <- dashboardBody(
-  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+    includeHTML(("google-analytics.html"))
+  ),
   
   tabItems(
     # Overview
