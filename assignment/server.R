@@ -26,13 +26,33 @@ server <- function(input, output) {
         if (length(input$title_select) == 0) title == title else title %in% input$title_select
       )
   })
-
+  
   # Uploaded file
   history_to_compare <- reactive({
     file <- input$file
     return(netflix_data(csv_file = file$datapath))
   })
+
+  # Netflix Date Range
+  date_range_me <- reactive({
+    netflix_data() %>% 
+      mutate(date = mdy(date)) %>% 
+      subset(date >= format(input$date[1]) & date <= format(input$date[2])) %>% 
+      filter(
+        if (length(input$title_select) == 0) title == title else title %in% input$title_select
+      )
+  })
   
+  # Uploaded Date Range
+  date_range_compare <- reactive({
+    history_to_compare() %>% 
+      mutate(date = mdy(date)) %>% 
+      subset(date >= format(input$date[1]) & date <= format(input$date[2])) %>% 
+      filter(
+        if (length(input$title_select) == 0) title == title else title %in% input$title_select
+      )
+  })
+    
   ### Filters
   possible_choices <- reactive({
     data %>% 
@@ -179,17 +199,26 @@ server <- function(input, output) {
       ) 
     }
   })
-  
-  # Test DataTable
-  output$test <- DT::renderDataTable({
-    if (is.null(input$file)) {
-      DT::datatable(tibble("Error:" = "Please upload a file in the sidebar."))
-    } else {
-      DT::datatable(history_to_compare())
-    }
+
+  # # of TV Shows
+  output$number_of_tv_shows <- renderPlotly({
+    ggplotly(
+      number_of(date_range_me(), date_range_compare(), movie = "No"),
+      tooltip = c("text"), height = 170
+    ) %>% 
+      layout(showlegend = FALSE)
   })
   
-  # Comparison of Total # of Views
+  # # of Movies
+  output$number_of_movies <- renderPlotly({
+    ggplotly(
+      number_of(date_range_me(), date_range_compare()),
+      tooltip = c("text"), height = 170
+    ) %>% 
+      layout(showlegend = FALSE)
+  })
+  
+  # Comparison of Total # of TV Show Views
   output$compare_views <- renderPlotly({
     if (is.null(input$file)) {
       plot(1, 1, col = "white")
@@ -197,7 +226,7 @@ server <- function(input, output) {
     } else {
       ggplotly(
         comparison_chart(netflix_data(), history_to_compare(), input$date[1], input$date[2]),
-        tooltip = c("text")
+        tooltip = c("text"), height = 290
       )
     }
   })

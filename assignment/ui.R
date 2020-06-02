@@ -39,8 +39,12 @@ sidebar <- dashboardSidebar(
                      start = "2020-01-01", end = Sys.Date())
     ),
     
+    conditionalPanel(
+      condition = "input.smenu == 'overview' | input.smenu == 'statistics'",
+      uiOutput("is_movie")
+    ),
+    
     # Static Inputs
-    uiOutput("is_movie"),
     uiOutput("title_selection"),
     
     # Disclaimer
@@ -110,22 +114,28 @@ body <- dashboardBody(
     # Comparison
     tabItem(
       tabName = "comparison",
-      
+
       fluidRow(
-        infoBoxOutput("match", width = 3),
+        infoBoxOutput("match", width = 4),
+
+        box(
+          title = "# of TV Shows", width = 4, status = "primary", height = 230,
+          plotlyOutput("number_of_tv_shows")
+        ),
         
         box(
-          title = "Distribution of Genres", width = 9, status = "primary",
-          DT::dataTableOutput("test")
+          title = "# of Movies", width = 4, status = "danger", height = 230,
+          plotlyOutput("number_of_movies")
         )
       ),
       
       fluidRow(
         box(
-          title = "Comparison of All Time Total # of Views", width = 12, status = "success",
+          title = "Comparison of All Time Total # of TV Show Views", width = 12, status = "success", height = 350,
           plotlyOutput("compare_views")
         )
       )
+
     )
   )
 )

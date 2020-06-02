@@ -44,7 +44,8 @@ netflix_data <- function(csv_file = "data/NetflixViewingHistory.csv") {
       date = Date,
       title = ifelse(!is.na(subtitle), paste0(title, ":", subtitle), title)
     ) %>% 
-    select(-c(colon_count, Date, subtitle))
+    select(-c(colon_count, Date, subtitle)) %>% 
+    distinct()
   
   return(netflix_data)
   
@@ -204,6 +205,8 @@ shared_cum_sum <- function(data) {
     select(date, cum_show, cum_movie) %>% 
     gather("movie_or_show", "cum_sum", -date) %>% 
     mutate(movie_or_show = ifelse(movie_or_show == "cum_show", "TV Show", "Movie"))
+  
+  return(data)
 }
 
 # Total Number of Views
@@ -246,11 +249,11 @@ daily_views <- function(data) {
 
 ### Comparison
 # Shared count
-shared_count <- function(data, start_date, end_date) {
+shared_count <- function(data, movie = "Yes") {
   shared_count <- data %>% 
-    subset(date >= format(start_date) & date <= format(end_date)) %>% 
     select(title, is_movie) %>% 
     distinct() %>% 
+    filter(is_movie == movie) %>% 
     group_by(is_movie) %>% 
     count() %>% 
     ungroup()
@@ -259,30 +262,30 @@ shared_count <- function(data, start_date, end_date) {
 }
 
 # # of TV Shows & # of Movies
-number_of <- function(compare_me, compare_other, start_date, end_date, movie = "Yes") {
+number_of <- function(compare_me, compare_other, movie = "Yes") {
   data <- rbind(
-    shared_count(compare_me) %>% 
-      filter(is_movie == movie) %>% 
+    shared_count(compare_me, movie) %>% 
       mutate(is_movie = ifelse(is_movie == movie, "Baseline")),
-    shared_count(compare_other) %>% 
-      filter(is_movie == movie) %>% 
+    shared_count(compare_other, movie) %>% 
       mutate(is_movie = ifelse(is_movie == movie, "Uploaded"))
     )
   
-  p <- ggplot(data, aes(x = is_movie, y = n, fill = is_movie)) +
+  p <- ggplot(data, aes(x = is_movie, y = n, fill = is_movie, text = paste0("<b>", n, "</b> TV Shows/Movies"))) +
     geom_col(show.legend = FALSE) +
     my_theme +
     theme(
-      axis.text.x = element_text(),
+      axis.text.x = element_text(angle = 0),
       axis.text.y = element_text()
     )
+  
+  return(p)
 }
 
-# Total # of Views
+# Total # of TV Show Views
 comparison_chart <- function(compare_me, compare_other, start_date, end_date) {
-  compare_me <- shared_cum_sum(shared_stats_data(compare_me %>% mutate(date = mdy(date)))) %>% 
+  compare_me <- shared_cum_sum(shared_stats_data(compare_me %>% mutate(date = mdy(date)) %>% filter(is_movie == "No"))) %>% 
     subset(date >= format(start_date) & date <= format(end_date))
-  compare_other <- shared_cum_sum(shared_stats_data(compare_other %>% mutate(date = mdy(date)))) %>% 
+  compare_other <- shared_cum_sum(shared_stats_data(compare_other %>% mutate(date = mdy(date)) %>% filter(is_movie == "No"))) %>% 
     subset(date >= format(start_date) & date <= format(end_date))
   
   p <- ggplot(NULL, aes(date, cum_sum, text = paste0("Date: <b>", date, "</b><br>Total Views: <b>", cum_sum, "</b>"))) +
