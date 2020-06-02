@@ -29,6 +29,8 @@ server <- function(input, output) {
   
   # Uploaded file
   history_to_compare <- reactive({
+    req(input$file)
+    
     file <- input$file
     return(netflix_data(csv_file = file$datapath))
   })
