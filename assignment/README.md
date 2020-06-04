@@ -57,13 +57,13 @@ Based on the `runtime`, calculates how much time was spent on Netflix.
 
 #### `percentage_match`
 
-Calculates the intersection of the baseline viewing history (mine) and the uploaded file basedon on distinct titles.
+Calculates the intersection of the baseline viewing history (mine) and the uploaded file based on distinct titles.
 
 ### Charts
 
 ##### `my_theme`
 
-I created a custom theme for `ggplot2` that hides the background, some of the axis texts, gives an angle to the x axis, and sets a lighter color for the grids.
+I created a custom theme for `ggplot2` that hides the background, some of the axis texts, gives an angle to the x axis text, and sets a lighter color for the grids.
 
 #### `last_x_days_chart`
 
@@ -140,7 +140,7 @@ The Overview tab focuses on KPIs for the whole dataset, these are all `valueBox`
 - Movies Watched
 - Time Spent on Netflix
 
-And looking at a trend of the last N number of days at a glance with `plotly` charts (idea from [htmlwidgets.org](http://www.htmlwidgets.org/)), as well as the genres of these titles.
+And looks at a trend of the last N number of days at a glance with `plotly` charts (idea from [htmlwidgets.org](http://www.htmlwidgets.org/)), as well as the genres of these titles.
 
 ### Statistics
 
@@ -165,7 +165,7 @@ The Statistics tab shows two `plotly` charts, one with the cumulative number of 
 
 The Comparison tab allows the user to upload their own Netflix viewing history, and compare it against mine (refered to as Baseline). Visuals are only calculated once a file has been uploaded.
 
-There's a KPI showing the overall match in percentage based on the intersection of unique titles (`infoBox`) on the top left corner. Next to it are two bar charts comparing the number of unique TV shows and movies that were watched in the date range. The "Comparison of All Time Total # of TV Show Views" shows a cumulative view of the number of TV show episodes compared to the baseline by date.
+There's a KPI showing the overall match in percentage based on the intersection of unique titles (`infoBox`) in the top left corner. Next to it are two bar charts comparing the number of unique TV shows and movies that were watched in the date range. The "Comparison of All Time Total # of TV Show Views" chart shows a cumulative view of the number of TV show episodes compared to the baseline by date.
 
 ## Shinyproxy
 
@@ -183,7 +183,7 @@ sudo R -e "devtools::with_libpaths(new = '/usr/local/lib/R/site-library', instal
 sudo Rscript -e "library(devtools);with_libpaths(new = '/usr/local/lib/R/site-library', install_github('jemus42/tRakt', upgrade_dependencies = FALSE))"
 ```
 
-For my starting point, I used the [rocker/shiny-verse](https://hub.docker.com/r/rocker/shiny-verse) image from DockerHub. This was my final **Dockerfile**:
+For my starting point, I used the [rocker/shiny-verse](https://hub.docker.com/r/rocker/shiny-verse) image from DockerHub. This was my final Dockerfile:
 
 ```
 FROM rocker/shiny-verse
