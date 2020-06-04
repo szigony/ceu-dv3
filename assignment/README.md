@@ -113,11 +113,11 @@ Returns a table with the N most popular movies in the selected period.
 
 ## Styling
 
-
+> The custom CSS that was applied can be found in the **[www/style.css](https://github.com/szigony/ceu-dv3/blob/master/assignment/www/style.css)** file.
 
 ## Google Analytics
 
-
+> Google Analytics tracking was added to the header of the page in **[ui.R](https://github.com/szigony/ceu-dv3/blob/master/assignment/ui.R)** by including the **[google-analytics.html](https://github.com/szigony/ceu-dv3/blob/master/assignment/google-analytics.html)** file.
 
 ## Application
 
