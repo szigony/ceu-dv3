@@ -121,15 +121,36 @@ Returns a table with the N most popular movies in the selected period.
 
 ## Application
 
-
+> The application is available [here](https://szigeti-patrik.shinyapps.io/netflix-behavior/).
 
 ### Overivew
 
+**Filters:**
+- Title (`selectInput` with titles that meet all selected criteria)
+- Last Days Shown (`sliderInput`)
+- TV Shows or Movies? (`radioButtons`)
 
++ Disclaimer with `htmlOutput`
+
+The Overview tab focuses on KPIs for the whole dataset, these are all `valueBox`es:
+- Number of different TV Shows
+- Episodes Watched
+- Movies Watched
+- Time Spent on Netflix
+
+And looking at a trend of the last N number of days at a glance with `plotly` charts (idea from [htmlwidgets.org](http://www.htmlwidgets.org/)), as well as the genres of these titles.
 
 ### Statistics
 
+**Filters:**
+- Title
+- Top Views Shown (`numericInput`)
+- Date Range (`dateRangeInput`)
+- TV Shows or Movies?
 
++ Disclaimer
+
+The Statistics tab shows two `plotly` charts, one with the cumulative number of views within the period to look at trending and regularities in the data, and one with the number of daily views, both stacked by the `is_movie` filter. There are also two `DT` data tables with the N most popular TV shows and movies. For the TV shows, you can also see the number of episodes watched in the period. All visuals are reacting to the inputs in the sidebar.
 
 ### Comparison
 
