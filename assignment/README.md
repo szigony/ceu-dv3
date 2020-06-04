@@ -198,5 +198,10 @@ EXPOSE 3838
 CMD ["R", "-e", "shiny::runApp('/app', port = 3838, host = '0.0.0.0')"]
 ```
 
+The image I created is called **netflix-behavior**.
+
 ## Recommendations
 
+- Due to the API fetching the data from trakt.tv, the load time of the dashboard is high, that could be optimized.
+- I didn't end up using the information about language in the dataset.
+- It could be interesting to start off with a landing/prompt page where a user can upload their own history, and use that for the analysis, rather than having a pre-determined baseline.
