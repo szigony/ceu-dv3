@@ -121,11 +121,13 @@ Returns a table with the N most popular movies in the selected period.
 
 ## Application
 
-> The application is available [here](https://szigeti-patrik.shinyapps.io/netflix-behavior/).
+> The application is available **[here](https://szigeti-patrik.shinyapps.io/netflix-behavior/)**.
+
+I applied `conditionalPanel`s for the sidebars to only show filters/inputs where they are relevant or affect the visualizations.
 
 ### Overivew
 
-**Filters:**
+**Sidebar:**
 - Title (`selectInput` with titles that meet all selected criteria)
 - Last Days Shown (`sliderInput`)
 - TV Shows or Movies? (`radioButtons`)
@@ -142,7 +144,7 @@ And looking at a trend of the last N number of days at a glance with `plotly` ch
 
 ### Statistics
 
-**Filters:**
+**Sidebar:**
 - Title
 - Top Views Shown (`numericInput`)
 - Date Range (`dateRangeInput`)
@@ -154,11 +156,47 @@ The Statistics tab shows two `plotly` charts, one with the cumulative number of 
 
 ### Comparison
 
+**Sidebar:**
+- Title
+- Date Range
+- Upload Your Netflix History (`fileInput`)
 
++ Disclaimer
+
+The Comparison tab allows the user to upload their own Netflix viewing history, and compare it against mine (refered to as Baseline). Visuals are only calculated once a file has been uploaded.
+
+There's a KPI showing the overall match in percentage based on the intersection of unique titles (`infoBox`) on the top left corner. Next to it are two bar charts comparing the number of unique TV shows and movies that were watched in the date range. The "Comparison of All Time Total # of TV Show Views" shows a cumulative view of the number of TV show episodes compared to the baseline by date.
 
 ## Shinyproxy
 
+In order to create the Docker image, I had to run a couple of commands from the terminal:
 
+- I installed the following packages: `shinydashboard`, `tidyverse`, `plotly`, `DT`:
+
+```
+sudo R -e "devtools::with_libpaths(new = '/usr/local/lib/R/site-library', install.packages(c('shinydashboard', 'tidyverse', 'plotly', 'DT'), repos='https://cran.rstudio.com/'))"
+```
+
+- And an additional package from GitHub:
+
+```
+sudo Rscript -e "library(devtools);with_libpaths(new = '/usr/local/lib/R/site-library', install_github('jemus42/tRakt', upgrade_dependencies = FALSE))"
+```
+
+For my starting point, I used the [rocker/shiny-verse](https://hub.docker.com/r/rocker/shiny-verse) image from DockerHub. This was my final **Dockerfile**:
+
+```
+FROM rocker/shiny-verse
+
+RUN installGithub.r jemus42/tRakt
+RUN install2.r shinydashboard tidyverse plotly DT
+
+RUN mkdir /app
+COPY *.R /app/
+
+EXPOSE 3838
+CMD ["R", "-e", "shiny::runApp('/app', port = 3838, host = '0.0.0.0')"]
+```
 
 ## Recommendations
 
